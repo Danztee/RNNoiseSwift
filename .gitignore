@@ -63,6 +63,10 @@ Secrets.Targets
 *.xcarchive
 .swiftpm
 
+# Vendored RNNoise refresh artifacts
+Libraries/RNNoise/models/
+Libraries/RNNoise/*.tar.gz
+
 # Package lock files
 package-lock.json
 yarn.lock
