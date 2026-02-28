@@ -13,9 +13,23 @@ Swift wrapper for the [RNNoise](https://github.com/xiph/rnnoise) C library.
    swift build -c debug
    ```
 3. Add `RNNoiseSwift` as a local package in Xcode.
-4. Use `processBuffer(_:)` or `process(_:)` from `RNNoise`.
+4. Use the stateful streaming API:
+   ```swift
+   let rnnoise = RNNoise()
+   let denoised = try rnnoise.processStream(samples: samples48k, sampleRate: 48_000)
+   let tail = rnnoise.flush(processPartialFrame: false)
+   ```
 
-> Note: Input buffers must be mono PCM Float32.
+## Input requirements
+- RNNoise expects 48 kHz audio.
+- Use PCM Float32 samples.
+- Multi-channel `AVAudioPCMBuffer` input is averaged to mono.
+
+## API notes
+- `processStream(samples:sampleRate:)` and `processStream(_ buffer:)` are the recommended APIs.
+- Incomplete frames are buffered internally; samples are not dropped between calls.
+- `flush(processPartialFrame:)` lets you retrieve pending samples at end-of-stream.
+- Legacy in-place methods `process(_:)` and `processBuffer(_:)` are kept for compatibility and only process full frames from each call.
 
 ## Production-ready source layout
 This fork vendors RNNoise C sources directly under `Libraries/RNNoise`, including
@@ -31,6 +45,11 @@ If you need to refresh model source files from upstream:
 ## Build
 ```bash
 swift build -c debug
+```
+
+## Test
+```bash
+swift test
 ```
 
 ## How to build XCFramework manually
